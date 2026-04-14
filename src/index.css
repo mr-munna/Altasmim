@@ -1,0 +1,18 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;700&family=Montserrat:wght@400;600;700&family=Tenor+Sans&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Playfair Display", ui-serif, Georgia, serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-montserrat: "Montserrat", sans-serif;
+  --font-optima: "Tenor Sans", sans-serif;
+  
+  --color-theme-primary: var(--theme-color, #1c1917);
+}
+
+@utility selection-theme {
+  &::selection {
+    background-color: color-mix(in srgb, var(--theme-color, #1c1917) 20%, transparent);
+  }
+}

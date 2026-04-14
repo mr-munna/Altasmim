@@ -1,0 +1,94 @@
+{
+  "entities": {
+    "SiteSettings": {
+      "title": "Site Settings",
+      "description": "Global settings for the website like logo, name, and contact info.",
+      "type": "object",
+      "properties": {
+        "logoUrl": { "type": "string", "description": "URL of the site logo" },
+        "siteName": { "type": "string", "description": "Name of the engineering firm" },
+        "contactPhone": { "type": "string", "description": "Primary contact phone number" },
+        "contactEmail": { "type": "string", "description": "Primary contact email address" },
+        "footerText": { "type": "string", "description": "Copyright text for the footer" }
+      },
+      "required": ["siteName", "contactPhone"]
+    },
+    "Post": {
+      "title": "Recent Post",
+      "description": "A blog post or insight to be displayed on the home page.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "Title of the post" },
+        "excerpt": { "type": "string", "description": "Short summary of the post" },
+        "image": { "type": "string", "description": "URL of the post image" },
+        "date": { "type": "string", "description": "Date of the post" },
+        "content": { "type": "string", "description": "Full content of the post" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "excerpt", "image", "date"]
+    },
+    "Review": {
+      "title": "Customer Review",
+      "description": "A testimonial from a client.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Name of the reviewer" },
+        "role": { "type": "string", "description": "Role or title of the reviewer" },
+        "content": { "type": "string", "description": "The review text" },
+        "rating": { "type": "number", "description": "Star rating (1-5)" },
+        "avatar": { "type": "string", "description": "URL of the reviewer's avatar" }
+      },
+      "required": ["name", "content", "rating"]
+    },
+    "FloatingAd": {
+      "title": "Floating Advertisement",
+      "description": "A promotional popup for special occasions.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "Title of the ad" },
+        "message": { "type": "string", "description": "Main message of the ad" },
+        "imageUrl": { "type": "string", "description": "Optional image for the ad" },
+        "link": { "type": "string", "description": "Optional link for the ad" },
+        "isActive": { "type": "boolean", "description": "Whether the ad is currently visible" },
+        "occasion": { "type": "string", "description": "Name of the occasion (e.g., Eid, New Year)" }
+      },
+      "required": ["title", "message", "isActive"]
+    },
+    "QuoteRequest": {
+      "title": "Quote Request",
+      "description": "A submission from the 'Get Quote' form.",
+      "type": "object",
+      "properties": {
+        "fullName": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "serviceType": { "type": "string" },
+        "message": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["fullName", "email", "phone", "serviceType", "message"]
+    }
+  },
+  "firestore": {
+    "/settings/global": {
+      "schema": "SiteSettings",
+      "description": "Global site configuration"
+    },
+    "/posts/{postId}": {
+      "schema": "Post",
+      "description": "Collection of recent blog posts"
+    },
+    "/reviews/{reviewId}": {
+      "schema": "Review",
+      "description": "Collection of customer testimonials"
+    },
+    "/ads/{adId}": {
+      "schema": "FloatingAd",
+      "description": "Collection of floating advertisements"
+    },
+    "/quotes/{quoteId}": {
+      "schema": "QuoteRequest",
+      "description": "Collection of submitted quote requests"
+    }
+  }
+}

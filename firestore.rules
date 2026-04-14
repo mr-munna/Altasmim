@@ -1,0 +1,122 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: settings/global
+    // Fields: logoUrl, siteName, contactPhone, contactEmail, footerText
+    //
+    // Collection: posts
+    // Fields: title, excerpt, image, date, content, createdAt
+    //
+    // Collection: reviews
+    // Fields: name, role, content, rating, avatar
+    //
+    // Collection: ads
+    // Fields: title, message, imageUrl, link, isActive, occasion
+    //
+    // Collection: quotes
+    // Fields: fullName, email, phone, serviceType, message, createdAt
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+          (request.auth.token.email == "mrmunna774@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    function isValidString(field, minLen, maxLen) {
+      return request.resource.data[field] is string &&
+        request.resource.data[field].size() >= minLen &&
+        request.resource.data[field].size() <= maxLen;
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+    function isValidPost() {
+      return hasRequiredFields(['title', 'excerpt', 'image', 'date']) &&
+        isValidString('title', 1, 200) &&
+        isValidString('excerpt', 1, 500);
+    }
+
+    function isValidReview() {
+      return hasRequiredFields(['name', 'content', 'rating']) &&
+        request.resource.data.rating is number &&
+        request.resource.data.rating >= 1 &&
+        request.resource.data.rating <= 5;
+    }
+
+    function isValidAd() {
+      return hasRequiredFields(['title', 'message', 'isActive']) &&
+        request.resource.data.isActive is bool;
+    }
+
+    function isValidQuote() {
+      return hasRequiredFields(['fullName', 'email', 'phone', 'serviceType', 'message']);
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    // Site Settings
+    match /settings/global {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Posts
+    match /posts/{postId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Reviews
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if isValidReview() && 
+                      isValidString('name', 1, 100) && 
+                      isValidString('content', 1, 1000) &&
+                      (request.resource.data.keys().hasOnly(['name', 'role', 'content', 'rating', 'avatar', 'createdAt']));
+      allow update, delete: if isAdmin();
+    }
+
+    // Ads
+    match /ads/{adId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Quotes
+    match /quotes/{quoteId} {
+      allow read: if isAdmin();
+      allow create: if true;
+      allow update, delete: if isAdmin();
+    }
+
+    // User Roles (for future admins)
+    match /users/{userId} {
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+      allow write: if isAdmin();
+    }
+  }
+}
